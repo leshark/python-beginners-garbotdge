@@ -14,7 +14,7 @@ from utils import bot, logger, validate_command, watching_newcommers
 # Handler for banning invited user bots
 @bot.message_handler(content_types=['new_chat_members'])
 def ban_invited_bots(message):
-    if not validate_command(message, check_chat=True):
+    if not validate_command(message, check_isinchat=True):
         return
 
     new_users.ban_bots(message)
