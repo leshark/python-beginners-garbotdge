@@ -7,15 +7,7 @@ import tokens
 
 
 bot_token = tokens.bot    # set your token in .bashrc (see tokens.py)
-
 chat_name = '@ru_python_beginners'
-chat_id = -1001105793906
-admin_ids = [
-    207275675,
-    91386064,
-    300903692,
-    158695346
-]
 
 path_dir = os.path.dirname(os.path.abspath(__file__))
 data_name = path_dir + '/data/data'
@@ -25,13 +17,18 @@ ro_list = ['5', '30', '120', 'ban']
 report_limit = 3
 
 # Adds an option of running the bot in debug mode right from a console:
-# `$ python3 bot.py --debug`  OR  `$ python3 bot.py -d`
+# `$ python3 main.py --debug`  OR  `$ python3 main.py -d`
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', help='runs bot in debug mode', action='store_true')
 args = parser.parse_args()
 if args.debug:
     bot_token = tokens.bot_test  # set your token in .bashrc (see tokens.py)
     chat_name = '@pybegtest'
-    chat_id = -1001185257556     # "PyBeg Test" chat's id
-
     print("Running bot in debug mode")
+
+
+# Automatically gets required ids depending on chat_name
+from utils import get_admins, get_chat_id
+
+chat_id = get_chat_id(chat_name)
+admin_ids = get_admins(chat_name)

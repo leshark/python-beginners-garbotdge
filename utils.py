@@ -52,7 +52,7 @@ def validate_command(message, check_isprivate=False, check_isinchat=False, check
     if check_isadmin and message.from_user.id not in config.admin_ids:
         logger.info("User {0} tried to call {1}. Aborting".\
                         format(get_user(message.from_user), message.text.split(' ')[0]))
-        return False 
+        return False
 
     return True
 
@@ -71,3 +71,17 @@ def watching_newcommers(user_id):
 
         data['members'][user_id] += 1
         return True
+
+
+def get_chat_id(chat):
+    """Returns a chat's id
+    """
+
+    return bot.get_chat(chat).id
+
+
+def get_admins(chat):
+    """Returns a list of chat admins' ids
+    """
+
+    return [admin.user.id for admin in bot.get_chat_administrators(chat) if not admin.user.is_bot]
