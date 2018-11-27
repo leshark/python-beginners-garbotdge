@@ -3,7 +3,7 @@
 import shelve
 
 import config
-from utils import bot, logger, get_user
+from utils import bot, bot_id, logger, get_user
 
 
 def ban_bots(message):
@@ -17,7 +17,7 @@ def ban_bots(message):
         # Checks every new member
         for member in message.new_chat_members:
             # If new member is bot, kicks it out and moves on
-            if member.is_bot:
+            if member.is_bot and member.id != bot_id:
                 bot.kick_chat_member(chat_id=config.chat_id, user_id=member.id)
                 logger.info("Bot {} has been kicked out".format(get_user(member)))
                 continue

@@ -11,6 +11,7 @@ import config
 
 # Initializes the bot
 bot = telebot.TeleBot(config.bot_token, threaded=False)
+bot_id = bot.get_me().id
 
 # Initializes the logger
 logger = telebot.logger
