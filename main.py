@@ -8,7 +8,7 @@ from requests.exceptions import ConnectionError, ReadTimeout
 
 import config
 from commands import monitor, new_users, report
-from utils import bot, logger, validate_command, watching_newcommers
+from utils import bot, get_admins, get_user, logger, validate_command, watching_newcommers
 
 
 # Handler for banning invited user bots
@@ -26,8 +26,24 @@ def start_msg(message):
     if not validate_command(message, check_isprivate=True, check_isadmin=True):
         return
 
-    bot.reply_to(message, "Сюда будут пересылаться репорты из чата.")
-    logger.info("Admin {} called /start".format(message.from_user.id))
+    start_text = "Вы действительно админ чата {}.\n"\
+                "Значит я вам сюда буду пересылать пользовальские репорты "\
+                "и подозрительные сообщения.".format(config.chat_name)
+    bot.reply_to(message, start_text)
+    logger.info("Admin {} has initiated a chat with the bot".format(get_user(message.from_user)))
+
+
+# Handler for updating a list of chat's admins to memory
+@bot.message_handler(commands=['admins'])
+def update_admin_list(message):
+    if not validate_command(message, check_isprivate=True, check_isadmin=True):
+        return
+
+    config.admin_ids = get_admins(config.chat_id)
+    admins = ',\n'.join([str(admin) for admin in config.admin_ids])
+    update_text = "Список администратов успешно обновлён:\n{}".format(admins)
+    bot.reply_to(message, update_text)
+    logger.info("Admin {} has updated the admin list".format(get_user(message.from_user)))
 
 
 # Handler for reporting spam to a chat's admins
