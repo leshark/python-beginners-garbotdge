@@ -30,25 +30,26 @@ def start_msg(message):
     logger.info("Admin {} called /start".format(message.from_user.id))
 
 
-@bot.message_handler(content_types=['text'])
+# Handler for reporting spam to a chat's admins
+@bot.message_handler(func=lambda m: m.chat.type != 'private' and m.text and\
+                         m.text.lower().startswith('!report'))
 def report_to_admins(message):
-    if message.text.lower().startswith('!report'):
-        if not validate_command(message, check_isreply=True):
-            bot.reply_to(message, "Кого репортим?")
-        else:
-            report.my_report(message)
+    if not validate_command(message, check_isreply=True):
+        bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        return
 
-    if watching_newcommers(message.from_user.id):
-        monitor.scan_contents(message)
+    report.my_report(message)
 
 
-@bot.message_handler(content_types=['sticker', 'photo', 'audio',\
+# Handler for monitoring messages of users who have <= 10 posts
+@bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',\
                         'document', 'video', 'voice', 'video_note'])
 def scan_for_spam(message):
     if watching_newcommers(message.from_user.id):
         monitor.scan_contents(message)
 
 
+# Callback handler for the admins' judgment
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     user_id = int(call.message.text.split(' ')[3])
@@ -70,6 +71,7 @@ def callback_inline(call):
         data['pending_ids'].remove(message_id)
 
 
+# Entry point
 while __name__ == '__main__':
     try:
         bot.polling(none_stop=True, interval=1, timeout=60)

@@ -41,7 +41,7 @@ def ro_giver(message, db, count):
         return
 
     user = message.from_user
-    bot.delele_message(chat_id=message.chat.id, message_id=message.message_id)
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
     db[user.id] = 0 if not db.get(user.id) else db[user.id]
     user_ro_status = config.ro_list[db[user.id]]
@@ -63,9 +63,7 @@ def report_to_admins(message):
     """
 
     from_chat = bot.get_chat(message.chat.id)
-    print(from_chat)
     from_chat_name = from_chat.username
-    print(from_chat_name)
     reported_id = message.reply_to_message.message_id
     reported_link = "https://t.me/{0}/{1}".format(from_chat_name, reported_id)
 
