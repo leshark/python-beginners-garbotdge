@@ -55,10 +55,15 @@ def forbidden_entities(message):
 
 
 def punisher(message):
-    """Deletes the message from chat,
+    """Gives RO to user who posted the message,
+    deletes the message from chat,
     forwards the deleted message to the admins,
     triggers judgment buttons
     """
+
+    bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id)
+    logger.info("User {} has been restricted for leading to a channel"\
+                    .format(message.from_user))
 
     with shelve.open(config.data_name, 'c', writeback=True) as data:
         data['reported_ids'] = [] if not data.get('reported_ids') else data['reported_ids']
