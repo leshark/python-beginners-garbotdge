@@ -14,7 +14,7 @@ def my_report(message):
     """
 
     with shelve.open(config.data_name, 'c', writeback=True) as data:
-        data['reported_ids'] = [] if not data.get('reported_ids') else data['reported_ids']
+        data['reported_pending'] = [] if not data.get('reported_pending') else data['reported_pending']
         data['report_ro_span'] = [time.time(), time.time()+60*config.ro_span_mins, 1]\
                                 if not data.get('report_ro_span') else data['report_ro_span']
 
@@ -22,12 +22,12 @@ def my_report(message):
         if time.time() > data['report_ro_span'][1]:
             data['report_ro_span'] = [time.time(), time.time()+60*config.ro_span_mins, 1]
 
-        if message.reply_to_message.message_id in data['reported_ids']:
+        if message.reply_to_message.message_id in data['reported_pending']:
             data['reporters'] = {} if not data.get('reporters') else data['reporters']
             ro_giver(message, data['reporters'], data['report_ro_span'][2])
         else:
             report_to_admins(message)
-            data['reported_ids'].append(message.reply_to_message.message_id)
+            data['reported_pending'].append(message.reply_to_message.message_id)
 
         data['report_ro_span'][2] += 1
 

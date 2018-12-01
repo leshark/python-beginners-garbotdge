@@ -66,10 +66,9 @@ def punisher(message):
                     .format(message.from_user))
 
     with shelve.open(config.data_name, 'c', writeback=True) as data:
-        data['reported_ids'] = [] if not data.get('reported_ids') else data['reported_ids']
-        data['pending_ids'] = [] if not data.get('pending_ids') else data['pending_ids']
-        data['reported_ids'].append(message.message_id)
-        data["pending_ids"].append(message.message_id)
+        data['reported_pending'] = [] if not data.get('reported_pending') else data['reported_pending']
+        data['reported_pending'].append(message.message_id)
+        data['members'][message.from_user.id] -= 1
 
     judgement_text = "Reported user's ID: {} \n"\
                         "Reported message's ID: {} \n"\

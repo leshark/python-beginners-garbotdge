@@ -72,10 +72,7 @@ def callback_inline(call):
     message_id = int(call.message.text.split(' ')[7])
 
     with shelve.open(config.data_name, 'c', writeback=True) as data:
-        data['reported_ids'] = [] if not data.get('reported_ids') else data['reported_ids']
-        data['pending_ids'] = [] if not data.get('pending_ids') else data['pending_ids']
-
-        if message_id not in data['pending_ids']:
+        if message_id not in data['reported_pending']:
             bot.reply_to(call.message, "Это сообщение уже отмодерировано.")
             return
 
@@ -86,7 +83,7 @@ def callback_inline(call):
                 can_send_messages=True, can_send_media_messages=True,\
                 can_send_other_messages=True, can_add_web_page_previews=True)
 
-        data['pending_ids'].remove(message_id)
+        data['reported_pending'].remove(message_id)
 
 
 # Entry point
