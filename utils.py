@@ -1,5 +1,6 @@
 #/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import functools
 import logging
 import shelve
 
@@ -88,17 +89,22 @@ def get_admins(chat):
 
 
 def enough_rights(func):
-    """Checks whether the bot has enough rights for to execute the called func
+    """Checks whether the bot has enough rights to execute the called func
     """
 
-    def wrapped(message):
+    @functools.wraps(func)
+    def wrapper(message):
+        if bot_id not in [admin.user.id for admin in bot.get_chat_administrators(config.chat_name)]:
+            logger.info("Bot is not an admin. Aborting")
+            return
         for admin_id in get_admins(config.chat_name):
             try:
                 bot.send_chat_action(chat_id=admin_id, action='typing')
                 return func(message)
             except ApiException as e:
                 if str(e.result) == config.unreachable_exc:
-                    logger.info("Bot can not contact any of the admins. Foreveralone")
-                    return
+                    continue
+        logger.info("Bot can not contact any of the admins. Foreveralone")
+        return
 
-    return wrapped
+    return wrapper
