@@ -12,12 +12,15 @@ def ban_bots(message):
     and adds the rest of the users to the database
     """
 
+    # If the members were invited by an admin, skips the bot detection
+    admin_invited = message.from_user.id in config.admin_ids
+
     with shelve.open(config.data_name, 'c', writeback=True) as data:
         data['members'] = {} if not data.get('members') else data['members']
         # Checks every new member
         for member in message.new_chat_members:
             # If new member is bot, kicks it out and moves on
-            if member.is_bot and member.id != bot_id:
+            if member.is_bot and member.id != bot_id and not admin_invited:
                 bot.kick_chat_member(chat_id=config.chat_id, user_id=member.id)
                 logger.info("Bot {} has been kicked out".format(get_user(member)))
                 continue

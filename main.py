@@ -18,6 +18,7 @@ def ban_invited_bots(message):
         return
 
     new_users.ban_bots(message)
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
 # Handler for initializing a chat's admin
@@ -89,7 +90,7 @@ def callback_inline(call):
 # Entry point
 while __name__ == '__main__':
     try:
-        bot.polling(none_stop=True, interval=1, timeout=60)
+        bot.polling(none_stop=True, timeout=60)
     except ConnectionError:
         logger.exception("ConnectionError")
         time.sleep(15)

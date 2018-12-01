@@ -16,6 +16,8 @@ ro_span_mins = 1
 ro_list = ['5', '30', '120', 'ban']
 report_limit = 3
 
+unreachable_exc = r'<Response [403]>'
+
 # Adds an option of running the bot in debug mode right from a console:
 # `$ python3 main.py --debug`  OR  `$ python3 main.py -d`
 parser = argparse.ArgumentParser()

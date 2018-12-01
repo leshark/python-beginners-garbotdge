@@ -71,7 +71,7 @@ def report_to_admins(message):
         try:
             bot.send_message(admin_id, reported_link)
         except ApiException as e:
-            if str(e.result) == r'<Response [403]>':
+            if str(e.result) == config.unreachable_msg:
                 continue
 
     logger.info("Message {} has been reported to the admins".\

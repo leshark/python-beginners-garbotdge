@@ -61,9 +61,10 @@ def punisher(message):
     triggers judgment buttons
     """
 
-    bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id)
+    if message.from_user.id not in config.admin_ids:
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id)
     logger.info("User {} has been restricted for leading to a channel"\
-                    .format(message.from_user))
+                    .format(get_user(message.from_user)))
 
     with shelve.open(config.data_name, 'c', writeback=True) as data:
         data['reported_pending'] = [] if not data.get('reported_pending') else data['reported_pending']
@@ -91,7 +92,7 @@ def punisher(message):
                     message_id=reported_init.message_id)
             bot.reply_to(reported, judgement_text, reply_markup=keyboard)
         except ApiException as e:
-            if str(e.result) == r'<Response [403]>':
+            if str(e.result) == config.unreachable_exc:
                 continue
 
     logger.info("Message {} has been auto-reported to the admins".format(message.message_id))
