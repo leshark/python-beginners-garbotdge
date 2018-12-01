@@ -78,6 +78,7 @@ def callback_inline(call):
     with shelve.open(config.data_name, 'c', writeback=True) as data:
         if message_id not in data['reported_pending']:
             bot.reply_to(call.message, "Это сообщение уже отмодерировано.")
+            bot.answer_callback_query(call.id)
             return
 
         if call.data == 'ban':
@@ -86,6 +87,7 @@ def callback_inline(call):
             bot.restrict_chat_member(chat_id=config.chat_id, user_id=user_id,\
                 can_send_messages=True, can_send_media_messages=True,\
                 can_send_other_messages=True, can_add_web_page_previews=True)
+        bot.answer_callback_query(call.id)
 
         data['reported_pending'].remove(message_id)
 
