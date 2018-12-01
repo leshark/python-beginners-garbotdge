@@ -8,7 +8,8 @@ from requests.exceptions import ConnectionError, ReadTimeout
 
 import config
 from commands import monitor, new_users, report
-from utils import bot, get_admins, get_user, logger, validate_command, watching_newcommers
+from utils import bot, get_admins, get_user, logger, validate_command,\
+                     watching_newcommers, enough_rights
 
 
 # Handler for banning invited user bots
@@ -50,6 +51,7 @@ def update_admin_list(message):
 # Handler for reporting spam to a chat's admins
 @bot.message_handler(func=lambda m: m.chat.type != 'private' and m.text and\
                          m.text.lower().startswith('!report'))
+@enough_rights
 def report_to_admins(message):
     if not validate_command(message, check_isreply=True):
         bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
@@ -61,6 +63,7 @@ def report_to_admins(message):
 # Handler for monitoring messages of users who have <= 10 posts
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',\
                         'document', 'video', 'voice', 'video_note'])
+@enough_rights
 def scan_for_spam(message):
     if watching_newcommers(message.from_user.id):
         monitor.scan_contents(message)
