@@ -1,9 +1,7 @@
-#/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import os
 
 
-"""To set your API tokens via environmental variables 
+"""To set your API tokens via environmental variables
 add the following lines to your .bashrc and restart bash by running $SHELL:
 export PYBEG_BOT_TOKEN="XXXXX:XXXXXXXXXXX"
 export PYBEG_BOT_TEST_TOKEN="XXXXX:XXXXXXXXXXX"

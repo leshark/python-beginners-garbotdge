@@ -1,5 +1,4 @@
-#/usr/bin/env python3
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 import os
 import shelve
 import time
@@ -93,15 +92,16 @@ def callback_inline(call):
 
 
 # Entry point
-while __name__ == '__main__':
-    try:
-        bot.polling(none_stop=True, timeout=60)
-    except ConnectionError:
-        logger.exception("ConnectionError")
-        time.sleep(15)
-    except ReadTimeout:
-        logger.exception("ReadTimeout")
-        time.sleep(10)
-    except KeyboardInterrupt:
-        logger.info("Good-bye")
-        os._exit(0)
+if __name__ == '__main__':
+    while True:
+        try:
+            bot.polling(none_stop=True, timeout=60)
+        except ConnectionError:
+            logger.exception("ConnectionError")
+            time.sleep(15)
+        except ReadTimeout:
+            logger.exception("ReadTimeout")
+            time.sleep(10)
+        except KeyboardInterrupt:
+            logger.info("Good-bye")
+            os._exit(0)
