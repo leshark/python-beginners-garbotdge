@@ -10,7 +10,7 @@ def ban_bots(message):
     """
 
     # If the members were invited by an admin, skips the bot detection
-    admin_invited = message.from_user.id in config.admin_ids and False
+    admin_invited = message.from_user.id in config.admin_ids
 
     session = Session()
 
