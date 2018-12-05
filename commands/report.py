@@ -1,9 +1,10 @@
-import shelve
+import redis
 import time
 
 from telebot.apihelper import ApiException
 
 import config
+from models import Session, User
 from utils import bot, logger, get_user
 
 
@@ -11,49 +12,57 @@ def my_report(message):
     """Handles users' reports
     """
 
-    with shelve.open(config.data_name, 'c', writeback=True) as data:
-        data['reported_pending'] = [] if not data.get('reported_pending') else data['reported_pending']
-        data['report_ro_span'] = [time.time(), time.time()+60*config.ro_span_mins, 1]\
-                                if not data.get('report_ro_span') else data['report_ro_span']
+    r = redis.StrictRedis(host='localhost')
 
-        # If time limit in which user's could get RO'd expires, starts a new span
-        if time.time() > data['report_ro_span'][1]:
-            data['report_ro_span'] = [time.time(), time.time()+60*config.ro_span_mins, 1]
+    if not r.get(message.reply_to_message.message_id):
+        report_to_admins(message)
+        r.set(message.reply_to_message.message_id, 0, ex=60*config.ro_span_mins)
 
-        if message.reply_to_message.message_id in data['reported_pending']:
-            data['reporters'] = {} if not data.get('reporters') else data['reporters']
-            ro_giver(message, data['reporters'], data['report_ro_span'][2])
-        else:
-            report_to_admins(message)
-            data['reported_pending'].append(message.reply_to_message.message_id)
-
-        data['report_ro_span'][2] += 1
+    if r.incr(message.reply_to_message.message_id) >= 2:
+        ro_giver(message, r)
 
 
-def ro_giver(message, db, count):
+def ro_giver(message, r):
     """Gives RO to users who flood with the !report command,
     or bans those who have more than 3 warnings
     """
 
-    if count <= config.report_limit:
-        return
-
-    user = message.from_user
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-    db[user.id] = 0 if not db.get(user.id) else db[user.id]
-    user_ro_status = config.ro_list[db[user.id]]
-    if user_ro_status.isdigit():
-        bot.restrict_chat_member(chat_id=config.chat_id, user_id=user.id,\
-                until_date=time.time() + 60*int(user_ro_status))
-        db[user.id] += 1
+    if int(r.get(message.reply_to_message.message_id)) == 2:
+        return
+
+    session = Session()
+
+    user_obj = session.query(User).get(message.from_user.id)
+    if not user_obj:
+        user_obj = User(message.from_user.id)
+        session.add(user_obj)
+        session.commit()
+
+    if message.from_user.id in config.admin_ids:
+        logger.info("Admin {} is flooding with !report. Doing nothing".\
+                        format(get_user(message.from_user)))
+        session.close()
+        return
+
+    user_obj.ro_level += 1
+    session.commit()
+
+    if user_obj.ro_level < 4:
+        user_ro_minutes = config.ro_levels[user_obj.ro_level]
+        print(user_ro_minutes)
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id,\
+                until_date=time.time() + 60*user_ro_minutes)
         logger.info("User {0} got {1} minutes of RO for flooding with !report".\
-            format(get_user(user), user_ro_status))
+                        format(get_user(message.from_user), user_ro_minutes))
     else:
-        bot.kick_chat_member(chat_id=config.chat_id, user_id=user.id)
-        del db[user.id]
+        bot.kick_chat_member(chat_id=config.chat_id, user_id=message.from_user.id)
+        session.delete(user_obj)
         logger.info("User {} has been banned for flooding with !report".\
-            format(get_user(user)))
+                        format(get_user(message.from_user)))
+
+    session.close()
 
 
 def report_to_admins(message):

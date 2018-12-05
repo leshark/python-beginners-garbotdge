@@ -1,11 +1,12 @@
 import functools
 import logging
-import shelve
 
 import telebot
 from telebot.apihelper import ApiException
 
 import config
+from models import Session, User
+
 
 # Initializes the bot
 bot = telebot.TeleBot(config.bot_token, threaded=False)
@@ -61,15 +62,20 @@ def watching_newcommers(user_id):
     i.e. whether the user has posted less than 10 messages
     """
 
-    with shelve.open(config.data_name, 'c', writeback=True) as data:
-        data['members'] = {} if not data.get('members') else data['members']
-        if not data['members'].get(user_id):
-            data['members'][user_id] = 0
-        elif data['members'][user_id] > 10:
-            return False
+    session = Session()
 
-        data['members'][user_id] += 1
-        return True
+    user_obj = session.query(User).get(user_id)
+    if not user_obj:
+        user_obj = User(user_id)
+        session.add(user_obj)
+    elif user_obj.msg_count > 10:
+        session.close()
+        return False
+    
+    user_obj.msg_count += 1
+    session.commit()
+    session.close()
+    return True
 
 
 def get_chat_id(chat):

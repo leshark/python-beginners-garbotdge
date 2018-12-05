@@ -7,14 +7,21 @@ import tokens
 bot_token = tokens.bot    # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 
-path_dir = os.path.dirname(os.path.abspath(__file__))
-data_name = path_dir + '/data/data'
-
-ro_span_mins = 1
-ro_list = ['5', '30', '120', 'ban']
-report_limit = 3
+ro_span_mins = 60
+ro_levels = {1: 5, 2: 30, 3: 120, 4: 'ban'}
 
 unreachable_exc = r'<Response [403]>'
+
+# Data for PostgreSQL
+db_user_default = 'postgres'
+db_password_default = ''
+
+db_user = os.getenv('POSTGRESQL_USER', db_user_default)
+db_password = os.getenv('POSTGRESQL_PASSWORD', db_password_default)
+db_host = 'localhost'
+db_port = 5432
+db_name = 'testdb'
+
 
 # Adds an option of running the bot in debug mode right from a console:
 # `$ python3 main.py --debug`  OR  `$ python3 main.py -d`

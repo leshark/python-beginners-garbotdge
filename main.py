@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import os
-import shelve
+import redis
 import time
 
 from requests.exceptions import ConnectionError, ReadTimeout
@@ -74,21 +74,20 @@ def callback_inline(call):
     user_id = int(call.message.text.split(' ')[3])
     message_id = int(call.message.text.split(' ')[7])
 
-    with shelve.open(config.data_name, 'c', writeback=True) as data:
-        if message_id not in data['reported_pending']:
-            bot.reply_to(call.message, "Это сообщение уже отмодерировано.")
-            bot.answer_callback_query(call.id)
-            return
-
-        if call.data == 'ban':
-            bot.kick_chat_member(chat_id=config.chat_id, user_id=user_id)
-        elif call.data == 'release':
-            bot.restrict_chat_member(chat_id=config.chat_id, user_id=user_id,\
-                can_send_messages=True, can_send_media_messages=True,\
-                can_send_other_messages=True, can_add_web_page_previews=True)
+    r = redis.StrictRedis(host='localhost')
+    if not r.get(message_id):
+        bot.reply_to(call.message, "Это сообщение уже отмодерировано.")
         bot.answer_callback_query(call.id)
+        return
 
-        data['reported_pending'].remove(message_id)
+    r.delete(message_id)
+    if call.data == 'ban':
+        bot.kick_chat_member(chat_id=config.chat_id, user_id=user_id)
+    elif call.data == 'release':
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=user_id,\
+            can_send_messages=True, can_send_media_messages=True,\
+            can_send_other_messages=True, can_add_web_page_previews=True)
+    bot.answer_callback_query(call.id)
 
 
 # Entry point

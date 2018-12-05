@@ -1,9 +1,10 @@
-import shelve
+import redis
 
 from telebot import types
 from telebot.apihelper import ApiException
 
 import config
+from models import Session, User
 from utils import bot, logger, get_user
 
 
@@ -64,10 +65,20 @@ def punisher(message):
     logger.info("User {} has been restricted for leading to a channel"\
                     .format(get_user(message.from_user)))
 
-    with shelve.open(config.data_name, 'c', writeback=True) as data:
-        data['reported_pending'] = [] if not data.get('reported_pending') else data['reported_pending']
-        data['reported_pending'].append(message.message_id)
-        data['members'][message.from_user.id] -= 1
+    session = Session()
+
+    user_obj = session.query(User).get(message.from_user.id)
+    if not user_obj:
+        user_obj = User(message.from_user.id)
+        session.add(user_obj)
+    else:
+        user_obj.msg_count -= 1
+
+    session.commit()
+    session.close()
+
+    r = redis.StrictRedis(host='localhost')
+    r.set(message.message_id, 1)
 
     judgement_text = "Reported user's ID: {} \n"\
                         "Reported message's ID: {} \n"\
@@ -77,20 +88,14 @@ def punisher(message):
     btn_release = types.InlineKeyboardButton(text="Снять РО", callback_data='release')
     keyboard.add(btn_ban, btn_release)
 
-    # Forwards to just one admin first, so it can delete the original message faster
-    reported_init = bot.forward_message(chat_id=config.admin_ids[0], from_chat_id=config.chat_id,\
-                    message_id=message.message_id)
-    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-    bot.reply_to(reported_init, judgement_text, reply_markup=keyboard)
-
-    # Re-forwards to the rest of the admins
-    for admin_id in config.admin_ids[1:]:
+    for admin_id in config.admin_ids:
         try:
             reported = bot.forward_message(chat_id=admin_id, from_chat_id=config.chat_id,\
-                    message_id=reported_init.message_id)
+                    message_id=message.message_id)
             bot.reply_to(reported, judgement_text, reply_markup=keyboard)
         except ApiException as e:
             if str(e.result) == config.unreachable_exc:
                 continue
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
     logger.info("Message {} has been auto-reported to the admins".format(message.message_id))
