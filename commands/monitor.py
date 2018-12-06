@@ -1,9 +1,8 @@
-import redis
-
 from telebot import types
 from telebot.apihelper import ApiException
 
 import config
+from config import r
 from models import Session, User
 from utils import bot, logger, get_user
 
@@ -76,8 +75,6 @@ def punisher(message):
 
     session.commit()
     session.close()
-
-    r = redis.StrictRedis(host='localhost')
     r.set(message.message_id, 1)
 
     judgement_text = "Reported user's ID: {} \n" \

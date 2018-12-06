@@ -4,6 +4,7 @@ import time
 from telebot.apihelper import ApiException
 
 import config
+from config import r
 from models import Session, User
 from utils import bot, logger, get_user
 
@@ -11,9 +12,6 @@ from utils import bot, logger, get_user
 def my_report(message):
     """Handles users' reports
     """
-
-    r = redis.StrictRedis(host='localhost')
-
     if not r.get(message.reply_to_message.message_id):
         report_to_admins(message)
         r.set(message.reply_to_message.message_id, 1, ex=60 * config.ro_span_mins)
