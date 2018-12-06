@@ -3,8 +3,7 @@ from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-import config
-
+from config import url
 Base = declarative_base()
 
 
@@ -29,6 +28,6 @@ class User(Base):
 #     format(config.db_user, config.db_password, \
 #            config.db_host, config.db_port, config.db_name)
 
-engine = create_engine(config.url)
+engine = create_engine(url)
 Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)
