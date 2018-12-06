@@ -39,7 +39,7 @@ def validate_command(message, check_isprivate=False, check_isinchat=False, check
                     format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
-    if check_isinchat and message.chat.id != config.chat_id:
+    if check_isinchat and message.chat.id != get_chat_id(config.chat_name):
         logger.info("We are not in our chat. Aborting")
         return False
 
