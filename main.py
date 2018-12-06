@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 import os
-import redis
 import time
 
 from requests.exceptions import ConnectionError, ReadTimeout
 
 import config
+from config import r
 from commands import monitor, new_users, report
-from utils import bot, get_admins, get_user, logger, validate_command,\
-                     watching_newcommers, enough_rights
+from utils import bot, get_admins, get_user, logger, validate_command, \
+    watching_newcommers, enough_rights
 
 
 # Handler for banning invited user bots
@@ -27,9 +27,9 @@ def start_msg(message):
     if not validate_command(message, check_isprivate=True, check_isadmin=True):
         return
 
-    start_text = "Вы действительно админ чата {}.\n"\
-                "Значит я вам сюда буду пересылать пользовальские репорты "\
-                "и подозрительные сообщения.".format(config.chat_name)
+    start_text = "Вы действительно админ чата {}.\n" \
+                 "Значит я вам сюда буду пересылать пользовальские репорты " \
+                 "и подозрительные сообщения.".format(config.chat_name)
     bot.reply_to(message, start_text)
     logger.info("Admin {} has initiated a chat with the bot".format(get_user(message.from_user)))
 
@@ -48,8 +48,7 @@ def update_admin_list(message):
 
 
 # Handler for reporting spam to a chat's admins
-@bot.message_handler(func=lambda m: m.chat.type != 'private' and m.text and\
-                         m.text.lower().startswith('!report'))
+@bot.message_handler(func=lambda m: m.chat.type != 'private' and m.text and m.text.lower().startswith('!report'))
 @enough_rights
 def report_to_admins(message):
     if not validate_command(message, check_isreply=True):
@@ -60,8 +59,8 @@ def report_to_admins(message):
 
 
 # Handler for monitoring messages of users who have <= 10 posts
-@bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',\
-                        'document', 'video', 'voice', 'video_note'])
+@bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',
+                                    'document', 'video', 'voice', 'video_note'])
 @enough_rights
 def scan_for_spam(message):
     if watching_newcommers(message.from_user.id):
@@ -74,7 +73,6 @@ def callback_inline(call):
     user_id = int(call.message.text.split(' ')[3])
     message_id = int(call.message.text.split(' ')[7])
 
-    r = redis.StrictRedis(host='localhost')
     if not r.get(message_id):
         bot.reply_to(call.message, "Это сообщение уже отмодерировано.")
         bot.answer_callback_query(call.id)
@@ -84,9 +82,9 @@ def callback_inline(call):
     if call.data == 'ban':
         bot.kick_chat_member(chat_id=config.chat_id, user_id=user_id)
     elif call.data == 'release':
-        bot.restrict_chat_member(chat_id=config.chat_id, user_id=user_id,\
-            can_send_messages=True, can_send_media_messages=True,\
-            can_send_other_messages=True, can_add_web_page_previews=True)
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=user_id,
+                                 can_send_messages=True, can_send_media_messages=True,
+                                 can_send_other_messages=True, can_add_web_page_previews=True)
     bot.answer_callback_query(call.id)
 
 
