@@ -3,7 +3,6 @@ import os
 
 import tokens
 import redis
-# from utils import get_admins, get_chat_id
 
 bot_token = tokens.bot  # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
@@ -37,7 +36,7 @@ if args.debug:
     print("Running bot in debug mode")
 
 # Automatically gets required ids depending on chat_name
-
+from utils import get_admins, get_chat_id
 
 chat_id = get_chat_id(chat_name)
 admin_ids = get_admins(chat_name)
