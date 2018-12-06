@@ -1,6 +1,5 @@
 import argparse
 import os
-from urllib import parse
 
 import tokens
 import redis
@@ -9,7 +8,7 @@ from utils import get_admins, get_chat_id
 bot_token = tokens.bot  # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 
-url = parse.urlparse(os.environ.get('DATABASE_URL'))
+url = os.environ.get('DATABASE_URL')
 r = redis.from_url(os.environ.get('REDIS_URL'))
 report_threshold = 2
 ro_span_mins = 60
