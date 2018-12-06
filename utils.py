@@ -7,7 +7,6 @@ from telebot.apihelper import ApiException
 import config
 from models import Session, User
 
-
 # Initializes the bot
 bot = telebot.TeleBot(config.bot_token, threaded=False)
 bot_id = bot.get_me().id
@@ -30,14 +29,14 @@ def get_user(user):
     return user_info
 
 
-def validate_command(message, check_isprivate=False, check_isinchat=False, check_isreply=False,\
-                        check_isadmin=False):
+def validate_command(message, check_isprivate=False, check_isinchat=False, check_isreply=False, \
+                     check_isadmin=False):
     """Checks whether a command was called properly
     """
 
     if check_isprivate and message.chat.type != 'private':
-        logger.info("User {0} called {1} not in a private chat. Aborting".\
-                        format(get_user(message.from_user), message.text.split(' ')[0]))
+        logger.info("User {0} called {1} not in a private chat. Aborting". \
+                    format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
     if check_isinchat and message.chat.id != config.chat_id:
@@ -45,13 +44,13 @@ def validate_command(message, check_isprivate=False, check_isinchat=False, check
         return False
 
     if check_isreply and getattr(message, 'reply_to_message') is None:
-        logger.info("User {0} called {1} the wrong way".\
-                        format(get_user(message.from_user), message.text.split(' ')[0]))
+        logger.info("User {0} called {1} the wrong way". \
+                    format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
     if check_isadmin and message.from_user.id not in config.admin_ids:
-        logger.info("User {0} tried to call {1}. Aborting".\
-                        format(get_user(message.from_user), message.text.split(' ')[0]))
+        logger.info("User {0} tried to call {1}. Aborting". \
+                    format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
     return True
@@ -71,7 +70,7 @@ def watching_newcommers(user_id):
     elif user_obj.msg_count > 10:
         session.close()
         return False
-    
+
     user_obj.msg_count += 1
     session.commit()
     session.close()

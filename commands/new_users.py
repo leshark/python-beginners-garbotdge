@@ -27,8 +27,8 @@ def ban_bots(message):
         if not session.query(User).get(member.id):
             user_obj = User(member.id)
             session.add(user_obj)
-            logger.info("User {} has joined the chat for the first time and "\
-                            "has been successfully added to the database".format(get_user(member)))
+            logger.info("User {} has joined the chat for the first time and " \
+                        "has been successfully added to the database".format(get_user(member)))
 
     session.commit()
     session.close()
