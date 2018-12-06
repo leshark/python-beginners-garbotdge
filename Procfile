@@ -1,1 +1,1 @@
-bot: python main.py --debug
+bot: python main.py
