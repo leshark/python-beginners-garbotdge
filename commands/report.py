@@ -16,9 +16,8 @@ def my_report(message):
 
     if not r.get(message.reply_to_message.message_id):
         report_to_admins(message)
-        r.set(message.reply_to_message.message_id, 0, ex=60*config.ro_span_mins)
-
-    if r.incr(message.reply_to_message.message_id) >= 2:
+        r.set(message.reply_to_message.message_id, 1, ex=60*config.ro_span_mins)
+    elif r.incr(message.reply_to_message.message_id) >= config.report_threshold:
         ro_giver(message, r)
 
 
@@ -29,7 +28,7 @@ def ro_giver(message, r):
 
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-    if int(r.get(message.reply_to_message.message_id)) == 2:
+    if int(r.get(message.reply_to_message.message_id)) == config.report_threshold:
         return
 
     session = Session()
@@ -51,7 +50,6 @@ def ro_giver(message, r):
 
     if user_obj.ro_level < 4:
         user_ro_minutes = config.ro_levels[user_obj.ro_level]
-        print(user_ro_minutes)
         bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id,\
                 until_date=time.time() + 60*user_ro_minutes)
         logger.info("User {0} got {1} minutes of RO for flooding with !report".\

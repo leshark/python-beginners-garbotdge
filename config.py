@@ -7,6 +7,7 @@ import tokens
 bot_token = tokens.bot    # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 
+report_threshold = 2 
 ro_span_mins = 60
 ro_levels = {1: 5, 2: 30, 3: 120, 4: 'ban'}
 
