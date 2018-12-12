@@ -15,6 +15,7 @@ def my_report(message):
     if not r.get(message.reply_to_message.message_id):
         report_to_admins(message)
         r.set(message.reply_to_message.message_id, 1, ex=60 * config.ro_span_mins)
+        bot.send_message(chat_id=message.chat.id, text='Мы примем все необходимые меры, спасибо.')
     elif r.incr(message.reply_to_message.message_id) >= config.report_threshold:
         ro_giver(message, r)
 
@@ -77,5 +78,5 @@ def report_to_admins(message):
             if str(e.result) == config.unreachable_exc:
                 continue
 
-    logger.info("Message {} has been reported to the admins". \
+    logger.info("Message {} has been reported to the admins".
                 format(message.reply_to_message.message_id))

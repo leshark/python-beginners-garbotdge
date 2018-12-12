@@ -54,7 +54,6 @@ def report_to_admins(message):
     if not validate_command(message, check_isreply=True):
         bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         return
-
     report.my_report(message)
 
 
