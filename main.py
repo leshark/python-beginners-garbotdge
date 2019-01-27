@@ -47,7 +47,7 @@ def update_admin_list(message):
     logger.info("Admin {} has updated the admin list".format(get_user(message.from_user)))
 
 
-@bot.message_handler(func=lambda m: m.text.lower() == '!paste' and m.reply_to_message)
+@bot.message_handler(func=lambda m: m.text and m.text.lower() == '!paste' and m.reply_to_message)
 def paste(message):
     source = message.reply_to_message
     new_paste = make_paste(source.text)
