@@ -51,8 +51,9 @@ def update_admin_list(message):
 def paste(message):
     source = message.reply_to_message
     new_paste = make_paste(source.text)
-    bot.reply_to(source, text=new_paste)
-    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    if new_paste:
+        bot.reply_to(source, text=new_paste)
+        bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
 # Handler for reporting spam to a chat's admins

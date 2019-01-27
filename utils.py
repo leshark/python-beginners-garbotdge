@@ -1,6 +1,6 @@
 import functools
 import logging
-
+from json.decoder import JSONDecodeError
 import telebot
 from telebot.apihelper import ApiException
 import requests
@@ -17,8 +17,11 @@ telebot.logger.setLevel(logging.INFO)
 
 
 def make_paste(content):
-    result = requests.post(config.PASTE_URL, data=content).json()
-    return 'https://hastebin.com/' + result['key']
+    try:
+        result = requests.post(config.PASTE_URL, data=content).json()
+        return 'https://hastebin.com/' + result['key']
+    except JSONDecodeError:
+        return False
 
 
 def get_user(user):
