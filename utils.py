@@ -3,7 +3,7 @@ import logging
 
 import telebot
 from telebot.apihelper import ApiException
-
+import requests
 import config
 from models import Session, User
 
@@ -14,6 +14,11 @@ bot_id = bot.get_me().id
 # Initializes the logger
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
+
+
+def make_paste(content):
+    result = requests.post(config.PASTE_URL, data=content).json()
+    return 'https://hastebin.com/' + result['key']
 
 
 def get_user(user):

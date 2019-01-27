@@ -7,6 +7,7 @@ import redis
 bot_token = tokens.bot  # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 
+PASTE_URL = 'https://hastebin.com/documents'
 url = os.environ.get('DATABASE_URL')
 r = redis.from_url(os.environ.get('REDIS_URL'))
 report_threshold = 2
