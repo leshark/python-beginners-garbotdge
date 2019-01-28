@@ -18,6 +18,8 @@ telebot.logger.setLevel(logging.INFO)
 
 
 def validate_document(message):
+    if not message.document:
+        return
     file_name = message.document.file_name
     file_size = message.document.file_size
     return os.path.splitext(file_name)[-1] in config.EXTENSIONS and file_size <= config.MAX_FILE_SIZE
