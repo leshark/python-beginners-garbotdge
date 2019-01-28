@@ -68,7 +68,7 @@ def report_to_admins(message):
     report.my_report(message)
 
 
-@bot.message_handler(func=validate_document)
+@bot.message_handler(content_types=['document'], func=validate_document)
 def document_to_paste(message):
     document = message.document
     file_info = bot.get_file(document.file_id)
