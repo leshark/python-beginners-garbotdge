@@ -72,7 +72,11 @@ def report_to_admins(message):
 def document_to_paste(message):
     document = message.document
     file_info = bot.get_file(document.file_id)
-    file_content = bot.download_file(file_info.file_path).decode()
+    try:
+        file_content = bot.download_file(file_info.file_path).decode()
+    except UnicodeDecodeError:
+        logger.error('Can\'t decode file content')
+        return
     new_paste = make_paste(file_content, document.file_name)
     if not new_paste:
         return
