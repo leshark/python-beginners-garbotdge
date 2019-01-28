@@ -1,6 +1,6 @@
 import functools
 import logging
-
+import os
 import requests
 import telebot
 from telebot.apihelper import ApiException
@@ -15,6 +15,12 @@ bot_id = bot.get_me().id
 # Initializes the logger
 logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
+
+
+def validate_document(message):
+    file_name = message.document.file_name
+    file_size = message.document.file_size
+    return os.path.splitext(file_name)[-1] in config.EXTENSIONS and file_size <= config.MAX_FILE_SIZE
 
 
 def validate_paste(message):

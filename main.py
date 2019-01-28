@@ -8,7 +8,7 @@ import config
 from config import r
 from commands import monitor, new_users, report
 from utils import bot, get_admins, get_user, logger, validate_command, \
-    watching_newcommers, enough_rights, make_paste, validate_paste
+    watching_newcommers, enough_rights, make_paste, validate_paste, validate_document
 
 
 # Handler for banning invited user bots
@@ -66,6 +66,17 @@ def report_to_admins(message):
         bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         return
     report.my_report(message)
+
+
+@bot.message_handler(content_types=['document'], func=validate_document)
+def document_to_paste(message):
+    document = message.document
+    file_info = bot.get_file(document.file_id)
+    file_content = bot.download_file(file_info.file_path)
+    new_paste = make_paste(file_content, document.file_name)
+    if not new_paste:
+        return
+    bot.reply_to(message, text=new_paste)
 
 
 # Handler for monitoring messages of users who have <= 10 posts
