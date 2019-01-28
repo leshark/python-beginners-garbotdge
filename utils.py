@@ -1,6 +1,5 @@
 import functools
 import logging
-from json.decoder import JSONDecodeError
 
 import requests
 import telebot
@@ -18,12 +17,28 @@ logger = telebot.logger
 telebot.logger.setLevel(logging.INFO)
 
 
-def make_paste(content):
-    try:
-        result = requests.post(config.PASTE_URL, data=content).json()
-        return 'https://hastebin.com/' + result['key']
-    except JSONDecodeError:
-        return False
+def validate_paste(message):
+    source = message.reply_to_message
+    if not source:
+        return
+    content = source.text or source.caption
+    return content and content.lower() == '!paste'
+
+
+def make_paste(content, holder):
+    headers = {'Authorization': f'token {config.GIT_TOKEN}'}
+    payload = {
+        'description': f'From: {holder}',
+        'public': True,
+        'files': {
+            'main.py': {
+                'content': content
+            }
+        }
+    }
+    response = requests.post(config.PASTE_URL, headers=headers, json=payload)
+    if response.status_code == 201:
+        return response.json()['html_url']
 
 
 def get_user(user):

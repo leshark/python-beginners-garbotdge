@@ -8,7 +8,7 @@ import config
 from config import r
 from commands import monitor, new_users, report
 from utils import bot, get_admins, get_user, logger, validate_command, \
-    watching_newcommers, enough_rights, make_paste
+    watching_newcommers, enough_rights, make_paste, validate_paste
 
 
 # Handler for banning invited user bots
@@ -47,16 +47,15 @@ def update_admin_list(message):
     logger.info("Admin {} has updated the admin list".format(get_user(message.from_user)))
 
 
-@bot.message_handler(func=lambda m: m.text and m.text.lower() == '!paste' and m.reply_to_message)
+@bot.message_handler(func=validate_paste)
 def paste(message):
     source = message.reply_to_message
     source_text = source.text or source.caption
-    if not source_text:
+    new_paste = make_paste(source_text, source.from_user.first_name)
+    if not new_paste:
         return
-    new_paste = make_paste(source_text)
-    if new_paste:
-        bot.reply_to(source, text=new_paste)
-        bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    bot.reply_to(source, text=new_paste)
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
 # Handler for reporting spam to a chat's admins
