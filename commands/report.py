@@ -74,7 +74,7 @@ def report_to_admins(message):
     reported_id = message.reply_to_message.message_id
     reason = message.text.split(maxsplit=1)
     reported_link = "https://t.me/{0}/{1}\n{2}".format(from_chat_name, reported_id,
-                                                       reason[1] if len(reason) > 1 else '')
+                                                       reason[1][:30] if len(reason) > 1 else '')
 
     for admin_id in config.admin_ids:
         try:
