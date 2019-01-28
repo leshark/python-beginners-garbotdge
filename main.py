@@ -50,7 +50,10 @@ def update_admin_list(message):
 @bot.message_handler(func=lambda m: m.text and m.text.lower() == '!paste' and m.reply_to_message)
 def paste(message):
     source = message.reply_to_message
-    new_paste = make_paste(source.text)
+    source_text = source.text or source.caption
+    if not source_text:
+        return
+    new_paste = make_paste(source_text)
     if new_paste:
         bot.reply_to(source, text=new_paste)
         bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)

@@ -1,9 +1,11 @@
 import functools
 import logging
 from json.decoder import JSONDecodeError
+
+import requests
 import telebot
 from telebot.apihelper import ApiException
-import requests
+
 import config
 from models import Session, User
 
