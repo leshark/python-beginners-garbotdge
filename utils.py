@@ -18,9 +18,10 @@ telebot.logger.setLevel(logging.INFO)
 
 
 def validate_document(message):
-    file_name = message.document.file_name
-    file_size = message.document.file_size
-    return os.path.splitext(file_name)[-1] in config.EXTENSIONS and file_size <= config.MAX_FILE_SIZE
+    if message.document:
+        file_name = message.document.file_name
+        file_size = message.document.file_size
+        return os.path.splitext(file_name)[-1] in config.EXTENSIONS and file_size <= config.MAX_FILE_SIZE
 
 
 def validate_paste(message):
