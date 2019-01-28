@@ -18,11 +18,11 @@ telebot.logger.setLevel(logging.INFO)
 
 
 def validate_paste(message):
+    action = message.text
     source = message.reply_to_message
-    if not source:
-        return
-    content = source.text or source.caption
-    return content and content.lower() == '!paste'
+    if source and action:
+        content = source.text or source.caption
+        return content and action.lower() == '!paste'
 
 
 def make_paste(content, holder):
