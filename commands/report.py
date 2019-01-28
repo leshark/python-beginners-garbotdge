@@ -1,5 +1,5 @@
-import redis
 import time
+from threading import Timer
 
 from telebot.apihelper import ApiException
 
@@ -7,7 +7,6 @@ import config
 from config import r
 from models import Session, User
 from utils import bot, logger, get_user
-from threading import Timer
 
 
 def my_report(message):
@@ -73,7 +72,9 @@ def report_to_admins(message):
     from_chat = bot.get_chat(message.chat.id)
     from_chat_name = from_chat.username
     reported_id = message.reply_to_message.message_id
-    reported_link = "https://t.me/{0}/{1}".format(from_chat_name, reported_id)
+    reason = message.text.split(maxsplit=1)
+    reported_link = "https://t.me/{0}/{1}\n{2}".format(from_chat_name, reported_id,
+                                                       reason[1] if len(reason) > 1 else '')
 
     for admin_id in config.admin_ids:
         try:
