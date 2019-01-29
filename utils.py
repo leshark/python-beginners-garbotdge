@@ -1,6 +1,7 @@
 import functools
 import logging
 import os
+
 import requests
 import telebot
 from telebot.apihelper import ApiException
@@ -32,13 +33,13 @@ def validate_paste(message):
         return content and action.lower() == '!paste'
 
 
-def make_paste(content, holder):
+def make_paste(content, holder, file_name='main.py'):
     headers = {'Authorization': f'token {config.GIT_TOKEN}'}
     payload = {
         'description': f'From: {holder}',
         'public': True,
         'files': {
-            'main.py': {
+            file_name: {
                 'content': content
             }
         }

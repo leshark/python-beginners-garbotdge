@@ -77,7 +77,7 @@ def document_to_paste(message):
     except UnicodeDecodeError:
         logger.error('Can\'t decode file content')
         return
-    new_paste = make_paste(file_content, document.file_name)
+    new_paste = make_paste(file_content, message.from_user.first_name, document.file_name)
     if not new_paste:
         return
     bot.reply_to(message, text=new_paste)
