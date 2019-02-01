@@ -57,23 +57,28 @@ def punisher(message):
     triggers judgment buttons
     """
 
-    if message.from_user.id not in config.admin_ids:
-        bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id)
-    logger.info("User {} has been restricted for leading to a channel" \
-                .format(get_user(message.from_user)))
-
     session = Session()
-
     user_obj = session.query(User).get(message.from_user.id)
     if not user_obj:
         user_obj = User(message.from_user.id)
         session.add(user_obj)
     else:
         user_obj.msg_count -= 1
-
     session.commit()
     session.close()
+
+    if r.get("spammer_{}".format(message.from_user.id)):
+        bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+        logger.info("Message {} has been deleted without alerting the admins due to flooding".format(message.message_id))
+        return
+
+    if message.from_user.id not in config.admin_ids:
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=message.from_user.id)
+        logger.info("User {} has been restricted for leading to a channel" \
+                    .format(get_user(message.from_user)))
+
     r.set(message.message_id, 1)
+    r.set("spammer_{}".format(message.from_user.id), 1, ex=config.spammer_timeout)
 
     judgement_text = "Reported user's ID: {} \n" \
                      "Reported message's ID: {} \n" \

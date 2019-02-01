@@ -14,6 +14,7 @@ PASTE_URL = 'https://api.github.com/gists'
 url = os.environ.get('DATABASE_URL')
 r = redis.from_url(os.environ.get('REDIS_URL'))
 report_threshold = 2
+spammer_timeout = 10
 ro_span_mins = 60
 ro_levels = {1: 5, 2: 30, 3: 120, 4: 'ban'}
 
