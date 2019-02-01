@@ -37,6 +37,8 @@ args = parser.parse_args()
 if args.debug:
     bot_token = tokens.bot_test  # set your token in .bashrc (see tokens.py)
     chat_name = '@pybegtest'
+    r = redis.StrictRedis(host='localhost')
+    url = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
     print("Running bot in debug mode")
 
 # Automatically gets required ids depending on chat_name

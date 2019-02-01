@@ -66,19 +66,19 @@ def ro_giver(message, r):
 
 
 def report_to_admins(message):
-    """Sends a link to a user's reported message to the admins
+    """Sends a link to a user's reported message with a reporter's reason to the admins
     """
 
     from_chat = bot.get_chat(message.chat.id)
     from_chat_name = from_chat.username
     reported_id = message.reply_to_message.message_id
     reason = message.text.split(maxsplit=1)
-    reported_link = "https://t.me/{0}/{1}\n{2}".format(from_chat_name, reported_id,
+    reported_msg = "https://t.me/{0}/{1}\n{2}".format(from_chat_name, reported_id,
                                                        reason[1][:30] if len(reason) > 1 else '')
 
     for admin_id in config.admin_ids:
         try:
-            bot.send_message(admin_id, reported_link)
+            bot.send_message(admin_id, reported_msg)
         except ApiException as e:
             if str(e.result) == config.unreachable_exc:
                 continue

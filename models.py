@@ -24,10 +24,6 @@ class User(Base):
             format(self.user_id, self.msg_count, self.ro_level)
 
 
-# engine_config = 'postgresql://{0}:{1}@{2}:{3}/{4}'. \
-#     format(config.db_user, config.db_password, \
-#            config.db_host, config.db_port, config.db_name)
-
 engine = create_engine(url)
 Base.metadata.create_all(bind=engine)
 Session = sessionmaker(bind=engine)

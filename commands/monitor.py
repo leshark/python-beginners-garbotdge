@@ -12,14 +12,12 @@ def scan_contents(message):
     calls punisher() upon detection of threat
     """
 
-    is_deleted = False
-
     if message.forward_from_chat:
         if message.forward_from_chat.type == 'channel':
             punisher(message)
-            is_deleted = True
+            return
 
-    if message.entities and not is_deleted:
+    if message.entities:
         if forbidden_entities(message):
             punisher(message)
 

@@ -56,10 +56,12 @@ def paste(message):
         return
     bot.reply_to(source, text=new_paste)
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+    logger.info("User {0} has requested a paste version of a message {1}".format(get_user(message.from_user),\
+                    message.reply_to_message.message_id))
 
 
 # Handler for reporting spam to a chat's admins
-@bot.message_handler(func=lambda m: m.chat.type != 'private' and m.text and m.text.lower().startswith('!report'))
+@bot.message_handler(func=lambda m: m.text and m.text.lower().startswith('!report'))
 @enough_rights
 def report_to_admins(message):
     if not validate_command(message, check_isreply=True):
@@ -75,12 +77,13 @@ def document_to_paste(message):
     try:
         file_content = bot.download_file(file_info.file_path).decode()
     except UnicodeDecodeError:
-        logger.error('Can\'t decode file content')
+        logger.error("Can't decode file content")
         return
     new_paste = make_paste(file_content, message.from_user.first_name, document.file_name)
     if not new_paste:
         return
     bot.reply_to(message, text=new_paste)
+    logger.info("Successfully created a paste of a document from message {}".format(message.message_id))
 
 
 # Handler for monitoring messages of users who have <= 10 posts
