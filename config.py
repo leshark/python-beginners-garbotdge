@@ -13,6 +13,9 @@ GIT_TOKEN = os.environ.get('GIT_TOKEN')
 PASTE_URL = 'https://api.github.com/gists'
 url = os.environ.get('DATABASE_URL')
 r = redis.from_url(os.environ.get('REDIS_URL'))
+whitelist_channels = [
+    -1001120424883  # @best_of_ru_python
+]
 report_threshold = 2
 spammer_timeout = 10
 ro_span_mins = 60

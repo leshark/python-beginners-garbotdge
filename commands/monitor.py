@@ -13,7 +13,8 @@ def scan_contents(message):
     """
 
     if message.forward_from_chat:
-        if message.forward_from_chat.type == 'channel':
+        if message.forward_from_chat.type == 'channel' and \
+        message.forward_from_chat.id not in config.whitelist_channels:
             punisher(message)
             return
 
