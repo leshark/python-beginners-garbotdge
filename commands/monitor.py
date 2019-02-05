@@ -4,7 +4,7 @@ from telebot.apihelper import ApiException
 import config
 from config import r
 from models import Session, User
-from utils import bot, logger, get_admins, get_user
+from utils import bot, logger, get_user
 
 
 def scan_contents(message):
@@ -58,8 +58,6 @@ def punisher(message):
     triggers judgment buttons
     """
 
-    is_reported = False
-
     session = Session()
     user_obj = session.query(User).get(message.from_user.id)
     if not user_obj:
@@ -91,20 +89,14 @@ def punisher(message):
     btn_release = types.InlineKeyboardButton(text="Снять РО", callback_data='release')
     keyboard.add(btn_ban, btn_release)
 
-    for admin_id in get_admins(config.chat_name):
+    for admin_id in config.admin_ids:
         try:
             reported = bot.forward_message(chat_id=admin_id, from_chat_id=config.chat_id, \
                                            message_id=message.message_id)
             bot.reply_to(reported, judgement_text, reply_markup=keyboard)
-            is_reported = True
         except ApiException as e:
             if str(e.result) == config.unreachable_exc:
                 continue
-
-    if not is_reported:
-        bot.send_message(config.chat_id, "Ни один модератор ко мне не подключён.")
-        logger.error("Bot couldn't contact any of the chat's admins. Foreveralone")
-        return
 
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
     logger.info("Message {} has been successfully auto-reported".format(message.message_id))

@@ -6,7 +6,7 @@ from telebot.apihelper import ApiException
 import config
 from config import r
 from models import Session, User
-from utils import bot, logger, get_admins, get_user
+from utils import bot, logger, get_user
 
 
 def my_report(message):
@@ -69,21 +69,16 @@ def report_to_admins(message):
     """Sends a link to a user's reported message with a reporter's reason to the admins
     """
 
-    from_chat = bot.get_chat(message.chat.id)
-    from_chat_name = from_chat.username
+    from_chat = config.chat_name[1:]
     reported_id = message.reply_to_message.message_id
     reason = message.text.split(maxsplit=1)
-    reported_msg = "https://t.me/{0}/{1}\n{2}".format(from_chat_name, reported_id,
+    reported_msg = "https://t.me/{0}/{1}\n{2}".format(from_chat, reported_id,
                                                        reason[1][:30] if len(reason) > 1 else '')
 
-    for admin_id in get_admins(config.chat_name):
+    for admin_id in config.admin_ids:
         try:
             bot.send_message(admin_id, reported_msg)
-            logger.info("Message {} has been successfully reported".format(message.reply_to_message.message_id))
-            return
         except ApiException as e:
             if str(e.result) == config.unreachable_exc:
                 continue
-
-    bot.send_message(config.chat_id, "Ни один модератор ко мне не подключён.")
-    logger.error("Bot couldn't contact any of the chat's admins. Foreveralone")
+    logger.info("Message {} has been successfully reported".format(message.reply_to_message.message_id))
