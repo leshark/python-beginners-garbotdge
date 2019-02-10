@@ -8,7 +8,7 @@ import tokens
 bot_token = tokens.bot  # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 MAX_FILE_SIZE = 1_000_000  # bytes
-EXTENSIONS = ['.py', '.txt']
+EXTENSIONS = ['.py', '.txt', '.json']
 GIT_TOKEN = os.environ.get('GIT_TOKEN')
 PASTE_URL = 'https://api.github.com/gists'
 url = os.environ.get('DATABASE_URL')
