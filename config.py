@@ -5,6 +5,7 @@ import redis
 
 import tokens
 
+filtered = ['picua']
 bot_token = tokens.bot  # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 MAX_FILE_SIZE = 1_000_000  # bytes

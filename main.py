@@ -89,6 +89,10 @@ def document_to_paste(message):
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',
                                     'document', 'video', 'voice', 'video_note'])
 def scan_for_spam(message):
+    if message.text in config.filtered:
+        bot.delete_message(message.chat.id, message_id=message.message_id)
+        bot.kick_chat_member(message.chat.id, message.from_user.id)
+        return
     if watching_newcommers(message.from_user.id):
         monitor.scan_contents(message)
 
