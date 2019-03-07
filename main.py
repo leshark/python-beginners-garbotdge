@@ -89,7 +89,7 @@ def document_to_paste(message):
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',
                                     'document', 'video', 'voice', 'video_note'])
 def scan_for_spam(message):
-    if config.filtered[0] in message.text:
+    if message.text and config.filtered[0] in message.text:
         bot.delete_message(message.chat.id, message_id=message.message_id)
         bot.kick_chat_member(message.chat.id, message.from_user.id)
         return
