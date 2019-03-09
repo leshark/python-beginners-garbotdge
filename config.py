@@ -5,7 +5,6 @@ import redis
 
 import tokens
 
-filtered = ['picua']
 bot_token = tokens.bot  # set your token in .bashrc (see tokens.py)
 chat_name = '@ru_python_beginners'
 MAX_FILE_SIZE = 1_000_000  # bytes
@@ -51,3 +50,8 @@ from utils import get_admins, get_chat_id
 
 chat_id = get_chat_id(chat_name)
 admin_ids = get_admins(chat_name)
+nometa = '''
+Пожалуйста, не задавайте мета-вопросов в чате!
+Мета-вопрос - это вопрос, который подразумевает другие вопросы.
+http://nometa.xyz/
+'''

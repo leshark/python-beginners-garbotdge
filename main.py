@@ -5,8 +5,8 @@ import time
 from requests.exceptions import ConnectionError, ReadTimeout
 
 import config
-from config import r
 from commands import monitor, new_users, report
+from config import r
 from utils import bot, get_admins, get_user, logger, validate_command, \
     watching_newcommers, make_paste, validate_paste, validate_document
 
@@ -56,8 +56,15 @@ def paste(message):
         return
     bot.reply_to(source, text=new_paste)
     bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-    logger.info("User {0} has requested a paste version of a message {1}".format(get_user(message.from_user),\
-                    message.reply_to_message.message_id))
+    logger.info("User {0} has requested a paste version of a message {1}".format(get_user(message.from_user),
+                                                                                 message.reply_to_message.message_id))
+
+
+@bot.message_handler(func=lambda m: m.text and m.text.lower().startswith('!meta') and m.reply_to_message)
+def meta_question(message):
+    source = message.reply_to_message
+    bot.reply_to(source, text=config.nometa)
+    bot.delete_message(message_id=message.message_id, chat_id=message.chat.id)
 
 
 # Handler for reporting spam to a chat's admins
@@ -89,10 +96,6 @@ def document_to_paste(message):
 @bot.message_handler(content_types=['text', 'sticker', 'photo', 'audio',
                                     'document', 'video', 'voice', 'video_note'])
 def scan_for_spam(message):
-    if message.text and config.filtered[0] in message.text:
-        bot.delete_message(message.chat.id, message_id=message.message_id)
-        bot.kick_chat_member(message.chat.id, message.from_user.id)
-        return
     if watching_newcommers(message.from_user.id):
         monitor.scan_contents(message)
 
