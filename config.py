@@ -51,3 +51,8 @@ from utils import get_admins, get_chat_id
 
 chat_id = get_chat_id(chat_name)
 admin_ids = get_admins(chat_name)
+nometa = '''
+Пожалуйста, не задавайте мета-вопросов в чате!
+Мета-вопрос - это вопрос, который подразумевает другие вопросы.
+http://nometa.xyz/
+'''
