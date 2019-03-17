@@ -2,6 +2,7 @@ import functools
 import logging
 import os
 
+import random
 import requests
 import telebot
 from telebot.apihelper import ApiException
@@ -109,6 +110,12 @@ def watching_newcommers(user_id):
     session.close()
     return True
 
+
+def perfect_justice():
+    """give user Read only with 1/6 chance
+    """
+    return random.choice((False, False, False, False, False, True))
+    
 
 def get_chat_id(chat):
     """Returns a chat's id
