@@ -8,7 +8,8 @@ import config
 from commands import monitor, new_users, report
 from config import r
 from utils import bot, get_admins, get_user, logger, validate_command, \
-    watching_newcommers, make_paste, validate_paste, validate_document
+    watching_newcommers, make_paste, validate_paste, validate_document, \
+    perfect_justice
 
 
 # Handler for banning invited user bots
@@ -74,6 +75,15 @@ def report_to_admins(message):
         bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
         return
     report.my_report(message)
+    
+    
+@bot.message_handler(func=lambda m: m.text and m.text.lower().startswith('!justify'))
+def justify(message):
+    source = message.reply_to_message
+    if perfect_justice():
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=source.from_user_id)
+    else:
+        bot.reply_to(source, text="Lucky one")
 
 
 @bot.message_handler(content_types=['document'], func=validate_document)
