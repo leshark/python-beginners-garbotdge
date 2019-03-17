@@ -1,11 +1,9 @@
-import functools
 import logging
 import os
 
 import random
 import requests
 import telebot
-from telebot.apihelper import ApiException
 
 import config
 from models import Session, User
@@ -63,13 +61,13 @@ def get_user(user):
     return user_info
 
 
-def validate_command(message, check_isprivate=False, check_isinchat=False, check_isreply=False, \
+def validate_command(message, check_isprivate=False, check_isinchat=False, check_isreply=False,
                      check_isadmin=False):
     """Checks whether a command was called properly
     """
 
     if check_isprivate and message.chat.type != 'private':
-        logger.info("User {0} called {1} not in a private chat. Aborting". \
+        logger.info("User {0} called {1} not in a private chat. Aborting".
                     format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
@@ -78,12 +76,12 @@ def validate_command(message, check_isprivate=False, check_isinchat=False, check
         return False
 
     if check_isreply and getattr(message, 'reply_to_message') is None:
-        logger.info("User {0} called {1} the wrong way". \
+        logger.info("User {0} called {1} the wrong way".
                     format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
     if check_isadmin and message.from_user.id not in config.admin_ids:
-        logger.info("User {0} tried to call {1}. Aborting". \
+        logger.info("User {0} tried to call {1}. Aborting".
                     format(get_user(message.from_user), message.text.split(' ')[0]))
         return False
 
@@ -115,7 +113,7 @@ def perfect_justice():
     """give user Read only with 1/6 chance
     """
     return random.choice((False, False, False, False, False, True))
-    
+
 
 def get_chat_id(chat):
     """Returns a chat's id

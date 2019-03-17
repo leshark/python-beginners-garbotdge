@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import time
+import datetime
 
 from requests.exceptions import ConnectionError, ReadTimeout
 
@@ -80,10 +81,19 @@ def report_to_admins(message):
 @bot.message_handler(func=lambda m: m.text and m.text.lower().startswith('!justify'))
 def justify(message):
     source = message.reply_to_message
+
+    if not validate_command(message, check_isadmin=True):
+        return
+
     if perfect_justice():
-        bot.restrict_chat_member(chat_id=config.chat_id, user_id=source.from_user_id)
+        bot.reply_to(source, text="Bang! РО на день")
+        tomorrow = datetime.date.today() + datetime.timedelta(1)
+        unix_time = tomorrow.strftime("%s")
+        bot.restrict_chat_member(chat_id=config.chat_id, user_id=source.from_user_id, until_date=unix_time)
     else:
         bot.reply_to(source, text="Lucky one")
+
+    bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 
 @bot.message_handler(content_types=['document'], func=validate_document)
